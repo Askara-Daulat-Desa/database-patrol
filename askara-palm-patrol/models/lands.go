@@ -1,33 +1,26 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
+import "time"
 
-type PalmLand struct {
-	gorm.Model
-	ID uint16	`json:"id"`
-	Name string	`json:"name"`
-	AreaSize float32 `json:"area_size"`
-	Latitude float32 `json:"latitude"`
-	Longitude float32 `json:"longitude"`
-	DistrictID int `json:"district_id"`
-	CompanyID int	`json:"company_id"`
-	PalmBlock []PalmBlock `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-}
+type Land struct {
+	ID         int       `json:"id"`
+	AreaSize   float64   `json:"area_size"` //Might be guard clause for making new blocks
+	Name       string    `json:"name"`
+	Address    string    `json:"address"`
+	PostalCode string    `json:"postal_code"`
+	IsActive   bool      `json:"is_active"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
 
-type PalmBlock struct {
-	gorm.Model
-	ID uint16
-	Name string
-	PalmLandID uint16
-	AreaSize float32
-	AverageAge int	
-	PalmTree []PalmTree `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-}
+	// Get district, province, and regency from preload
+	DistrictID int       `json:"district_id"`
+	District   *District `json:"district" gorm:"foreignKey:DistrictID"`
 
-type PalmTree struct {
-	gorm.Model
-	ID uint16
-	PalmBlockID uint16
+	// Assign manually  from preload
+	ProvinceName string `json:"province_name" gorm:"-"`
+	RegencyName  string `json:"regency_name" gorm:"-"`
+	DistrictName string `json:"district_name" gorm:"-"`
+
+	// Count with query
+	TotalBlock int `json:"total_block" gorm:"-"`
 }
